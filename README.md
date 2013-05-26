@@ -1,4 +1,4 @@
 TraductionPHP
 =============
 
-With TraductionPHP, you can translate text based on messageformat.js templating in PHP
+With TraductionPHP, you can translate text templating in PHP
