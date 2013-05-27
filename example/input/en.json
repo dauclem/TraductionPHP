@@ -1,0 +1,7 @@
+{
+	"simple_text": "Hello World !",
+	"user_pseudo": "Welcome $PSEUDO !",
+	"new_message": "You have {$NUM, plural, zero[No new messages] one[$NUM new message] other[$NUM new messages]} in your mailbox.",
+	"new_message_more": "You have {$NUM, plural, zero[No new messages] one[$NUM new message] other[$NUM new messages]} in your mailbox from {$NUM2, plural, zero[No friends] one[$NUM2 friend] other[$NUM2 friends]}.",
+	"complex_string": "{$SEL1, select, other [Define : {$PLUR1, plural, one [1] other [{$SEL2, select, other [deep in the heart.] }] }] }"
+}

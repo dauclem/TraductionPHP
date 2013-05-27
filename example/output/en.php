@@ -1,0 +1,7 @@
+<?php $translate_keys['en']=array(
+'simple_text'=>'$r=\'Hello World !\';',
+'user_pseudo'=>'$r=\'Welcome \'.$PSEUDO.\' !\';',
+'new_message'=>'$r=\'You have \';switch(method_exists($l,\'plural\')?$l->plural($NUM):$NUM){case \'zero\':$r.=\'No new messages\';break;case \'one\':$r.=\'\'.$NUM.\' new message\';break;default:$r.=\'\'.$NUM.\' new messages\';break;}$r.=\' in your mailbox.\';',
+'new_message_more'=>'$r=\'You have \';switch(method_exists($l,\'plural\')?$l->plural($NUM):$NUM){case \'zero\':$r.=\'No new messages\';break;case \'one\':$r.=\'\'.$NUM.\' new message\';break;default:$r.=\'\'.$NUM.\' new messages\';break;}$r.=\' in your mailbox from \';switch(method_exists($l,\'plural\')?$l->plural($NUM2):$NUM2){case \'zero\':$r.=\'No friends\';break;case \'one\':$r.=\'\'.$NUM2.\' friend\';break;default:$r.=\'\'.$NUM2.\' friends\';break;}$r.=\'.\';',
+'complex_string'=>'$r=\'\';switch(method_exists($l,\'select\')?$l->select($SEL1):$SEL1){default:$r.=\'Define : \';switch(method_exists($l,\'plural\')?$l->plural($PLUR1):$PLUR1){case \'one\':$r.=\'1\';break;default:$r.=\'\';switch(method_exists($l,\'select\')?$l->select($SEL2):$SEL2){default:$r.=\'deep in the heart.\';break;}$r.=\'\';break;}$r.=\'\';break;}$r.=\'\';',
+);
