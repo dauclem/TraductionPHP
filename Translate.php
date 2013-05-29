@@ -3,6 +3,58 @@
 namespace Translate;
 
 class Translate {
+	/** @var null|Translate */
+	private static $instance = null;
+	private $locale = 'en';
+	private $json_files_path;
+	private $l = array();
+
+	/**
+	 * @param string $json_files_path Absolute path to directory with all locale.json files
+	 * @param string $locale
+	 * @return Translate
+	 */
+	public function __construct($json_files_path, $locale = 'en') {
+		self::$instance = $this;
+		$this->set_json_files_path($json_files_path);
+		$this->set_locale('en');
+	}
+
+	/**
+	 * Get last created instance
+	 *
+	 * @return null|Translate
+	 */
+	public static function getLastInstance() {
+		return self::$instance;
+	}
+
+	/**
+	 * @param string $locale
+	 */
+	public function set_locale($locale) {
+		$this->locale = $locale;
+
+		$json_file = $this->json_files_path.'/'.$this->locale.'.json';
+		if (file_exists($json_file)) {
+			$l = json_decode(file_get_contents($json_file));
+			if ($l) {
+				$this->l = array_merge($this->l, (array)$l);
+			}
+		}
+	}
+
+	/**
+	 * @param string $json_files_path
+	 * @throws \Exception
+	 */
+	public function set_json_files_path($json_files_path) {
+		$this->json_files_path = $json_files_path;
+		if (!file_exists($this->json_files_path) && !mkdir($this->json_files_path, 0755, true)) {
+			throw new \Exception('Cannot create json_files_path as "'.$this->json_files_path.'"');
+		}
+	}
+
 	/**
 	 * Generate PHP executable content from a json text template
 	 *
@@ -10,7 +62,7 @@ class Translate {
 	 * @return string
 	 * @todo can compile properly. Currently, replace when only 1 special char without test all string. Use strpos ?
 	 */
-	public static function compile($text_template) {
+	public function compile($text_template) {
 		return preg_replace(array(
 								 '#(?<!\\\\)(\\$\\w+)#',
 								 '#^(.*)$#',
@@ -38,7 +90,7 @@ class Translate {
 	 * @param string $input_dir
 	 * @param string $output_dir
 	 */
-	public static function preCompile($input_dir, $output_dir) {
+	public function preCompile($input_dir, $output_dir) {
 		$input_dir  = preg_replace('#\\/$#', '', $input_dir);
 		$output_dir = preg_replace('#\\/$#', '', $output_dir);
 
@@ -59,27 +111,42 @@ class Translate {
 	}
 
 	/**
+	 * @param array|string $params associative array or string to json format
+	 * @return array
+	 * @throws \Exception
+	 */
+	private function check_params($params) {
+		if (!is_array($params)) {
+			$params = json_decode($params);
+			if (!is_array($params)) {
+				throw new \Exception('Bad params format');
+			}
+		}
+		return $params;
+	}
+
+	/**
 	 * Parse a compiled text with params for chosen local
 	 *
-	 * @param string $locale
-	 * @param string $compiled_text
-	 * @param array  $params Associative array
+	 * @param string       $compiled_text
+	 * @param array|string $params Associative array
 	 * @return string
 	 * @throws \Exception
 	 */
-	public static function parse($locale, $compiled_text, $params = array()) {
-		$class_name = '\\Translate\\Functions\\'.$locale;
+	public function parse($compiled_text, $params = array()) {
+		$class_name = '\\Translate\\Functions\\'.$this->locale;
 		if (!class_exists($class_name)) {
-			$file_name = __DIR__.'/functions/'.$locale.'.php';
+			$file_name = __DIR__.'/functions/'.$this->locale.'.php';
 			if (file_exists($file_name)) {
 				require $file_name;
 			}
 			if (!class_exists($class_name)) {
-				throw new \Exception('Locale methods class for "'.$locale.'" does not exists');
+				throw new \Exception('Locale methods class for "'.$this->locale.'" does not exists');
 			}
 		}
 
-		$l = new $class_name();
+		$l      = new $class_name();
+		$params = $this->check_params($params);
 		foreach ($params as $k => $v) {
 			$$k = $v;
 		}
@@ -93,7 +160,21 @@ class Translate {
 		return $r;
 	}
 
-	public static function parseFromKey($locale, $key, $params) {
+	/**
+	 * @param string       $template
+	 * @param array|string $params
+	 * @return string
+	 */
+	public function parseFromTemplate($template, $params = array()) {
+		return $this->parse($this->compile($template), $params);
+	}
 
+	/**
+	 * @param string       $key
+	 * @param array|string $params
+	 * @return string
+	 */
+	public function parseFromKey($key, $params = array()) {
+		return isset($this->l[$key]) ? $this->parseFromTemplate($this->l[$key], $params) : '';
 	}
 }
