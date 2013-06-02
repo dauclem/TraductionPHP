@@ -134,15 +134,20 @@ class Translate {
 	 * @throws \Exception
 	 */
 	public function parse($compiled_text, $params = array()) {
+		static $initialized = false;
+
 		$class_name = '\\Translate\\Functions\\'.$this->locale;
-		if (!class_exists($class_name)) {
-			$file_name = __DIR__.'/functions/'.$this->locale.'.php';
-			if (file_exists($file_name)) {
-				require $file_name;
+		if (!$initialized) {
+			if (!class_exists($class_name, false)) {
+				$file_name = __DIR__.'/functions/'.$this->locale.'.php';
+				if (file_exists($file_name)) {
+					require $file_name;
+				}
+				if (!class_exists($class_name, false)) {
+					throw new \Exception('Locale methods class for "'.$this->locale.'" does not exists');
+				}
 			}
-			if (!class_exists($class_name)) {
-				throw new \Exception('Locale methods class for "'.$this->locale.'" does not exists');
-			}
+			$initialized = true;
 		}
 
 		$l      = new $class_name();
