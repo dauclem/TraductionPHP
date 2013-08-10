@@ -64,6 +64,7 @@ class Translate {
 	 */
 	public function compile($text_template) {
 		return preg_replace(array(
+								 '#\'#',
 								 '#(?<!\\\\)(\\$\\w+)#',
 								 '#^(.*)$#',
 								 '#(?<!\\\\)\\{\'\\.\\$(\\w+)\\.\',\\s*(\\w+),\\s*#',
@@ -73,6 +74,7 @@ class Translate {
 								 '#(?<!\\\\)\\]#',
 								 '#\\\\([\\$\\{\\}\\[\\]])#',
 							), array(
+									'\\\'',
 									'\'.$1.\'',
 									'$r=\'$1\';',
 									'\';switch(method_exists($l,\'$2\')?$l->$2($$1):$$1){',
